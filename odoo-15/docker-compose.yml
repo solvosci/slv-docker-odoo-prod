@@ -1,0 +1,72 @@
+version: '3'
+networks:
+  customNetwork:
+    driver: bridge
+    name: customNetwork
+
+services:
+  db-prod:
+    container_name: postgresql-prod
+    image: postgres:14.0
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - ${POSTGRES_PORT_PROD}:5432
+    volumes:
+      - postgres-data-prod:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - customNetwork
+  db-test:
+    container_name: postgresql-test
+    image: postgres:14.0
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - ${POSTGRES_PORT_TEST}:5432
+    volumes:
+      - postgres-data-test:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - customNetwork
+
+  odoo-prod:
+    restart: always
+    container_name: odoo-${ODOO_VERSION_PRODUCTION}
+    build: odoo-prod
+    ports:
+      - ${HTTP_PORT_PRODUCTION}:8069
+      - ${LONGPOLLING_PORT_PRODUCTION}:8072
+    volumes:
+      - odoo-data-prod:/opt/odoo
+    depends_on:
+      - db-prod
+    environment:
+      DB_PORT_5432_TCP_ADDR: db-prod
+      POSTGRES_HOST: postgresql-prod
+    networks:
+      - customNetwork
+  odoo-test:
+    restart: always
+    container_name: odoo-${ODOO_VERSION_TEST}
+    build: odoo-test
+    ports:
+      - ${HTTP_PORT_TEST}:8069
+      - ${LONGPOLLING_PORT_TEST}:8072
+    volumes:
+      - odoo-data-test:/opt/odoo
+    depends_on:
+      - db-test
+    environment:
+      DB_PORT_5432_TCP_ADDR: db-test
+      POSTGRES_HOST: postgresql-test
+    networks:
+      - customNetwork
+
+volumes:
+  postgres-data-prod:
+  postgres-data-test:
+  odoo-data-prod:
+  odoo-data-test:
