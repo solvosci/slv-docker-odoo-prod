@@ -1,31 +1,109 @@
-Docker configurations for Odoo Production environments
+DOCKER CONFIGURATIONS FOR ODOO PRODUCTION ENVIRONMENTS
 ======================================================
+
+## Table of Contents
+- [Installation](#installation)
+    - [Pre-installation](#pre-installation)
+    - [Docker installation](#docker-installation)
+- [Start-up](#start-up)
+    - [docker-compose](#docker-compose)
+    - [Step by step](#step-by-step)
+- [Useful commands](#useful-commands)
+    - [Docker Compose](#docker-compose-commands)
+    - [Docker Containers](#docker-container)
+    - [Docker Images](#docker-images)
+    - [Docker Networks](#docker-networks)
+    - [Docker Volumes](#docker-volumes)
+
+Installation
+=
+- ## Pre-installation
+    - Update the OS
+
+    <pre>
+    sudo apt update
+    </pre>
+
+    - Install requirements
+    <pre>
+    sudo apt-get install apt-transport-https ca-certificates curl software-properties-common
+    </pre>
+
+- ## Installation
+    - Add GPT key of Docker repository
+    <pre>
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+    </pre>
+
+    - Add Docker repository to the system
+    <pre>
+    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+    </pre>
+
+    - Update packages to add Docker
+    <pre>
+    sudo apt update
+    </pre>
+
+    - Finally install Docker
+    <pre>
+    sudo apt install docker-ce
+    </pre>
 
 START UP
 =
-- Enter odoo-x folder, with prompt
 
-DOCKER COMPOSE
-- Execute the next command: `docker compose up` (-d flag to execute in background)
-- It will run the containers and show all the logs in the console.
+### DOCKER COMPOSE
+- This command will mount the installation based on the docker compose file and it will show logs in the terminal (-d flag to execute in background).
+<pre>
+docker compose up
+</pre>
 
-STEP BY STEP
-- `docker network create customNetwork`
-- `docker run -d --name postgresql-prod --network customNetwork -e POSTGRES_USER=odoo -e POSTGRES_PASSWORD=odoo -p 5432:5432 -v postgres-data-prod:/var/lib/postgresql/data --restart always postgres:14.0`
-- `docker run -d --name postgresql-test --network customNetwork -e POSTGRES_USER=odoo -e POSTGRES_PASSWORD=odoo -p 35432:5432 -v postgres-data-test:/var/lib/postgresql/data --restart always postgres:14.0`
-- `docker build -t odoo-prod odoo-prod`
-- `docker run -d --name odoo-15-prod --network customNetwork -p 8069:8069 -p 8072:8072 -v odoo-data-prod:/opt/odoo --restart always -e DB_PORT_5432_TCP_ADDR=db-prod -e POSTGRES_HOST=postgresql-prod odoo-prod`
-- `docker build -t odoo-test odoo-test`
-- `docker run -d --name odoo-15-test --network customNetwork -p 8169:8069 -p 8172:8072 -v odoo-data-test:/opt/odoo --restart always -e DB_PORT_5432_TCP_ADDR=db-test -e POSTGRES_HOST=postgresql-test odoo-test`
+### STEP BY STEP
+- #### Create the network
+<pre>
+docker network create customNetwork
+</pre>
 
-DOCKER COMPOSE
+- #### Run postgresql production container based on default image
+<pre>
+docker run -d --name postgresql-prod --network customNetwork -e POSTGRES_USER=odoo -e POSTGRES_PASSWORD=odoo -p 5432:5432 -v postgres-data-prod:/var/lib/postgresql/data --restart always postgres:14.0
+</pre>
+
+- #### Run postgresql test container based on default image
+<pre>
+docker run -d --name postgresql-test --network customNetwork -e POSTGRES_USER=odoo -e POSTGRES_PASSWORD=odoo -p 35432:5432 -v postgres-data-test:/var/lib/postgresql/data --restart always postgres:14.0
+</pre>
+
+- #### Create odoo production image based on the Dockerfile
+<pre>
+docker build -t odoo-prod odoo-prod
+</pre>
+
+- #### Create odoo test image based on the Dockerfile
+<pre>
+docker build -t odoo-test odoo-test
+</pre>
+
+- #### Run odoo production container based on odoo-prod image with some flags
+<pre>
+docker run -d --name odoo-15-prod --network customNetwork -p 8069:8069 -p 8072:8072 -v odoo-data-prod:/opt/odoo --restart always -e DB_PORT_5432_TCP_ADDR=db-prod -e POSTGRES_HOST=postgresql-prod odoo-prod
+</pre>
+
+- #### Run odoo test container based on odoo-test image with some flags
+<pre>
+docker run -d --name odoo-15-test --network customNetwork -p 8169:8069 -p 8172:8072 -v odoo-data-test:/opt/odoo --restart always -e DB_PORT_5432_TCP_ADDR=db-test -e POSTGRES_HOST=postgresql-test odoo-test
+</pre>
+
+USEFUL COMMANDS
 =
+### DOCKER COMPOSE COMMANDS
+
 - `docker compose down` Will rollback de docker compose up (except images and volumes)
 - `docker compose up` Will build the docker compose file and will up the containers
 - `docker compose build` Will build the docker compose
 
-DOCKER CONTAINER
-=
+### DOCKER CONTAINER
 - `docker ps` Show running containers
 - `docker ps -a` Show all containers
 - `docker exec -it <container-name or id> bash` Opens the shell of the container
@@ -46,21 +124,18 @@ DOCKER CONTAINER
 - `docker logs <container-id>` Show the logs of the specified container
 - `docker logs –follow <container-id>` Show the logs of the container, and waits to get more logs
 
-DOCKER IMAGES
-=
+### DOCKER IMAGES
 - `docker images` List all images
 - `docker image rm <image-name:version>` Remove image
 - `docker build -t <image-name:tag> <path dockerfile>` Based on Dockerfile, build an image
 - `docker pull <image-name:version>` Download an image
 
-DOCKER NETWORKS
-=
+### DOCKER NETWORKS
 - `docker network ls` List all networks
 - `docker network create <network-name>` Create a custom Network
 - `docker network rm <network-name>` Removes the network
 
-DOCKER VOLUMES
-=
+### DOCKER VOLUMES
 - `docker volume create <volume-name>` Create a volume
 - `docker volume ls` List all volumes
 - `docker volume inspect <volume-name>` Display detailed information on one or more volumes
