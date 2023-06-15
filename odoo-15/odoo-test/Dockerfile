@@ -80,8 +80,8 @@ RUN useradd --create-home --home-dir /opt/odoo --no-log-init odoo
 RUN echo "odoo:odoo" | chpasswd
 
 # Copy Odoo configuration & entrypoint files
-COPY ./odoo.conf /opt/odoo
-COPY ./entrypoint.sh /opt/odoo
+COPY --chown="odoo:odoo" ./odoo.conf /opt/odoo
+COPY --chown="odoo:odoo" ./entrypoint.sh /opt/odoo
 
 # Install latest postgresql-client
 RUN apt-get update  \
@@ -101,6 +101,12 @@ USER odoo
 # Download Odoo with git and create extra-addons folder
 RUN /bin/bash -c "cd /opt/odoo && git clone https://github.com/odoo/odoo --branch 15.0 --single-branch --depth 1"
 RUN /bin/bash -c "mkdir -p /opt/odoo/custom-addons"
+
+# Create Virtual Enviroment
+RUN /bin/bash -c "cd /opt/odoo && virtualenv -p python3.8 venv"
+
+# Python dependencies
+RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -U setuptools && pip3 install -r /opt/odoo/odoo/requirements.txt && deactivate"
 
 # Clone interesting OCA repositories
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/account-analytic -b 15.0 --single-branch --depth 1 account-analytic"
@@ -135,8 +141,6 @@ RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/timesheet -b 15.0 --single-branch --depth 1 timesheet"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/web -b 15.0 --single-branch --depth 1 web"
 
-# Create Virtual Enviroment
-RUN /bin/bash -c "cd /opt/odoo && virtualenv -p python3.8 venv"
 
 #OCA Dependencies
 RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/account-financial-tools/requirements.txt && deactivate"
@@ -151,9 +155,6 @@ RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /op
 RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/stock-logistics-barcode/requirements.txt && deactivate"
 # RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/web/requirements.txt && deactivate"
 # RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/server-tools/requirements.txt && deactivate"
-
-# Python dependencies
-RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -U setuptools && pip3 install -r /opt/odoo/odoo/requirements.txt && deactivate"
 
 VOLUME ["/opt/odoo"]
 
