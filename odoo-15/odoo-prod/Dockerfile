@@ -113,6 +113,7 @@ RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/account-financial-reporting -b 15.0 --single-branch --depth 1 account-financial-reporting"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/account-financial-tools -b 15.0 --single-branch --depth 1 account-financial-tools"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/account-invoicing -b 15.0 --single-branch --depth 1 account-invoicing"
+RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/account-payment -b 15.0 --single-branch --depth 1 account-payment"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/bank-payment -b 15.0 --single-branch --depth 1 bank-payment"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/community-data-files -b 15.0 --single-branch --depth 1 community-data-files"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/connector -b 15.0 --single-branch --depth 1 connector"
@@ -144,6 +145,7 @@ RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA
 #OCA Dependencies
 RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/account-financial-tools/requirements.txt && deactivate"
 # RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/bank-payment/requirements.txt && deactivate"
+RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/account-payment/requirements.txt && deactivate"
 RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/community-data-files/requirements.txt && deactivate"
 RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/connector/requirements.txt && deactivate"
 # RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/edi/requirements.txt && deactivate"
