@@ -63,11 +63,12 @@ RUN set -x; \
             libxrender1 \
             xfonts-75dpi \
             xfonts-base \
-        && curl -o wkhtmltox.deb -SL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb \
-        && echo 'f1689a1b302ff102160f2693129f789410a1708a wkhtmltox.deb' | sha1sum -c - \
-        && dpkg --force-depends -i wkhtmltox.deb\
-        && apt-get -y install -f --no-install-recommends \
-        && rm -rf /var/lib/apt/lists/* wkhtmltox. \
+        && wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.0g-2ubuntu4_amd64.deb \
+        && dpkg -i libssl1.1_1.1.0g-2ubuntu4_amd64.deb \
+        && curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.focal_amd64.deb \
+        && echo 'ae4e85641f004a2097621787bf4381e962fb91e1 wkhtmltox.deb' | sha1sum -c - \
+        && apt install -y --no-install-recommends ./wkhtmltox.deb \
+        && rm -rf /var/lib/apt/lists/* wkhtmltox.deb \
         && apt install libssl-dev build-essential zlib1g-dev \
         && curl -o Python-3.8.10.tgz -SL https://www.python.org/ftp/python/3.8.10/Python-3.8.10.tgz \
         && tar xzf Python-3.8.10.tgz \
