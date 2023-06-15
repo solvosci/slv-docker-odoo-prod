@@ -29,6 +29,7 @@ DOCKER CONTAINER
 - `docker ps` Show running containers
 - `docker ps -a` Show all containers
 - `docker exec -it <container-name or id> bash` Opens the shell of the container
+- `docker exec -it -u 0 <container-name or id> bash` Opens the shell of the container as root user
 - `docker container rm <container-name or id>` Remove the specified container
 - `docker create <image-name>` Create a container based on the image
 - `docker create --name <container-name> <image-name>` Create a container with the specified name based on the image
