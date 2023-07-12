@@ -8,12 +8,22 @@ DOCKER CONFIGURATIONS FOR ODOO PRODUCTION ENVIRONMENTS
 - [Start-up](#start-up)
     - [docker-compose](#docker-compose)
     - [Step by step](#step-by-step)
-- [Useful commands](#useful-commands)
-    - [Docker Compose](#docker-compose-commands)
-    - [Docker Containers](#docker-container)
-    - [Docker Images](#docker-images)
-    - [Docker Networks](#docker-networks)
-    - [Docker Volumes](#docker-volumes)
+- [Backup](#backup)
+    - [Prepare backup structure](#prepare-backup-structure)
+    - [Stop services](#stop-services)
+    - [Backup database](#backup-database)
+    - [New odoo image](#new-odoo-image)
+    - [Backup odoo](#backup-odoo)
+    - [Start services](#start-services)
+    - [Result](#result)
+- [Restore](#restore)
+    - [Enter backup folder](#enter-backup-folder)
+    - [Create network](#create-network)
+    - [Restore database](#restore-database)
+    - [Create database container](#create-database-container)
+    - [Restore odoo](#restore-odoo)
+    - [Enable odoo image](#enable-odoo-image)
+    - [Create odoo container](#create-odoo-container)
 
 Installation
 =
@@ -94,6 +104,75 @@ docker run -d --name odoo-15-prod --network customNetwork -p 8069:8069 -p 8072:8
 <pre>
 docker run -d --name odoo-15-test --network customNetwork -p 8169:8069 -p 8172:8072 -v odoo-data-test:/opt/odoo --restart always -e DB_PORT_5432_TCP_ADDR=db-test -e POSTGRES_HOST=postgresql-test odoo-test
 </pre>
+
+BACKUP
+=
+### PREPARE BACKUP STRUCTURE
+
+- `mkdir /tmp/backup-docker` Create a backup directory
+- `cd /tmp/backup-docker` Enter the directory
+
+### STOP SERVICES
+
+- `docker stop <odoo-container-name>` Odoo service
+- `docker stop <postgresql-container-name>` Postgresql service
+
+### BACKUP DATABASE
+
+- `docker run --rm --volumes-from <postgresql-container-name> -v $PWD:/tmp/backup-docker ubuntu tar cvf /tmp/backup-docker/<custom-postgresql-name>.tar /var/lib/postgresql/data` Backup the postgresql volume
+
+### NEW ODOO IMAGE
+
+- `docker export <odoo-container-name> > <custom-image-name-odoo>.tar` Create image based on a container
+
+### BACKUP ODOO
+
+- `docker run --rm --volumes-from <odoo-container-name> -v $PWD:/tmp/backup-docker ubuntu tar cvf /tmp/backup-docker/<custom-name-odoo>.tar /opt/odoo` Backup the odoo volume
+
+### START SERVICES
+
+- `docker start <postgresql-container-name>` Postgresql service (Wait for postgresql to start)
+- `docker start <odoo-container-name>` Odoo service
+
+### RESULT
+- #### Now we have on /tmp/backup-docker folder
+<pre>
+- postgresql-test-data.tar
+- odoo-15-test-img.tar
+- odoo-15-test-data.tar
+</pre>
+
+RESTORE
+=
+### ENTER BACKUP FOLDER
+
+- `cd /tmp/backup-docker` Enter the backup directory
+
+### CREATE NETWORK
+
+- `docker network create <network-name>` Create network to connect the containers
+
+### RESTORE DATABASE
+
+- `docker volume create <custom-postgresql-volume-name>` Create postgres database volume
+- `docker run --rm -v <custom-postgresql-volume-name>:/var/lib/postgresql/data -v $PWD:/tmp/backup-docker ubuntu tar xvf /tmp/backup-docker/<custom-postgresql-name>.tar` Restore the postgresql volume
+
+### CREATE DATABASE CONTAINER
+
+- `docker run -d --name <postgresql-container-name> --network <network-name> -e POSTGRES_USER=odoo -e POSTGRES_PASSWORD=odoo -p 35432:5432 -v <custom-postgresql-volume-name>:/var/lib/postgresql/data --restart always postgres:14.0` Create and run the backup postgresql container
+
+### RESTORE ODOO
+
+- `docker volume create <custom-odoo-volume-name>` Create odoo volume
+- `docker run --rm -v <custom-odoo-volume-name>:/opt/odoo -v $PWD:/tmp/backup-docker ubuntu tar xvf /tmp/backup-docker/<custom-odoo-name>.tar` Restore the odoo volume
+
+### ENABLE ODOO IMAGE
+
+- `cat <exported-container-name>.tar | docker import --change 'CMD ["/opt/odoo/entrypoint.sh"]' - <custom-image-name-odoo>.tar` Create the odoo image, and add the entrypoint script
+
+### CREATE ODOO CONTAINER
+
+- `docker run -d --name <odoo-container-name> --network <network-name> -p 8169:8069 -p 8172:8072 -v <custom-odoo-volume-name>:/opt/odoo --restart always -e DB_PORT_5432_TCP_ADDR=db-test -e POSTGRES_HOST=<postgresql-container-name> <custom-image-name-odoo>.tar` Create and run the backup odoo container
 
 USEFUL COMMANDS
 =
