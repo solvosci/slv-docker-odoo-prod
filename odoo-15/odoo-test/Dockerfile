@@ -106,8 +106,8 @@ RUN /bin/bash -c "mkdir -p /opt/odoo/custom-addons"
 # Create Virtual Enviroment
 RUN /bin/bash -c "cd /opt/odoo && virtualenv -p python3.8 venv"
 
-# Python dependencies
-RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -U setuptools && pip3 install -r /opt/odoo/odoo/requirements.txt && deactivate"
+# Python dependencies, specific library versions to fix dependences error
+RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -U setuptools && pip3 install -r /opt/odoo/odoo/requirements.txt && pip3 install -U cryptography==38.0.2 && pip3 install -U pyopenssl==23.2.0 && deactivate"
 
 # Clone interesting OCA repositories
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/account-analytic -b 15.0 --single-branch --depth 1 account-analytic"
