@@ -6,7 +6,7 @@ networks:
 
 services:
   db-prod:
-    container_name: postgresql-prod
+    container_name: ${POSTGRESQL_VERSION_PRODUCTION}
     image: postgres:12.0
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
@@ -21,7 +21,7 @@ services:
 
   odoo-prod:
     restart: always
-    container_name: odoo-${ODOO_VERSION_PRODUCTION}
+    container_name: ${ODOO_VERSION_PRODUCTION}
     build: odoo-prod
     ports:
       - ${HTTP_PORT_PRODUCTION}:8069
@@ -32,7 +32,7 @@ services:
       - db-prod
     environment:
       DB_PORT_5432_TCP_ADDR: db-prod
-      POSTGRES_HOST: postgresql-prod
+      POSTGRES_HOST: ${POSTGRESQL_VERSION_PRODUCTION}
     networks:
       - odooNetwork
 

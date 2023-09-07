@@ -86,6 +86,9 @@ RUN chmod -R 775 /opt/odoo
 # Set default user to download extra addons and run the container 
 USER odoo
 
+# Create data folder
+RUN /bin/bash -c "mkdir -p /opt/odoo/data"
+
 # Copy Odoo configuration & entrypoint files
 COPY ./odoo.conf /opt/odoo
 COPY ./entrypoint.sh /opt/odoo
