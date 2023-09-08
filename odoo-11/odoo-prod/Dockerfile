@@ -80,22 +80,21 @@ RUN apt-get update  \
     && rm -f /etc/apt/sources.list.d/pgdg.list \
     && rm -rf /var/lib/apt/lists/*
 
+# Copy Odoo configuration & entrypoint files
+COPY --chown="odoo:odoo" ./odoo.conf /opt/odoo
+COPY --chown="odoo:odoo" ./entrypoint.sh /opt/odoo
+
 # set privileges for odoo files to odoo user
 RUN chmod -R 775 /opt/odoo
+
+# set execution permissions to entrypoint.sh
+RUN chmod u+x /opt/odoo/entrypoint.sh
 
 # Set default user to download extra addons and run the container 
 USER odoo
 
 # Create data folder
 RUN /bin/bash -c "mkdir -p /opt/odoo/data"
-
-# Copy Odoo configuration & entrypoint files
-COPY ./odoo.conf /opt/odoo
-COPY ./entrypoint.sh /opt/odoo
-
-# Copy Odoo configuration & entrypoint files
-COPY ./odoo.conf /opt/odoo
-COPY ./entrypoint.sh /opt/odoo
 
 # Download Odoo with git and create extra-addons folder
 RUN /bin/bash -c "cd /opt/odoo && wget https://github.com/odoo/odoo/archive/219d2296d67488855891573c979857c5fbfd1ebe.tar.gz && mkdir ./odoo && tar xzf 219d2296d67488855891573c979857c5fbfd1ebe.tar.gz --strip-components=1 -C odoo && rm 219d2296d67488855891573c979857c5fbfd1ebe.tar.gz"
