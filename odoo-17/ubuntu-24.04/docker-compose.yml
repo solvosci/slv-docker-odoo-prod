@@ -1,0 +1,39 @@
+version: '3'
+networks:
+  customNetwork:
+    driver: bridge
+    name: customNetwork
+services:
+  db-demo:
+    container_name: postgresql-demo
+    image: postgres:14.0
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - ${POSTGRES_PORT_DEMO}:5432
+    volumes:
+      - postgres-data-demo:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - customNetwork
+  odoo-demo:
+    restart: always
+    container_name: odoo-${ODOO_VERSION_DEMO}
+    build: odoo-demo
+    ports:
+      - ${HTTP_PORT_DEMO}:8069
+      - ${LONGPOLLING_PORT_DEMO}:8072
+    volumes:
+      - odoo-data-demo:/opt/odoo
+    depends_on:
+      - db-demo
+    environment:
+      DB_PORT_5432_TCP_ADDR: db-demo
+      POSTGRES_HOST: postgresql-demo
+    networks:
+      - customNetwork
+
+volumes:
+  postgres-data-demo:
+  odoo-data-demo:

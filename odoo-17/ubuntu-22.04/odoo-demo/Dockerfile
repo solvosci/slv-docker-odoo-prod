@@ -82,8 +82,8 @@ RUN useradd --create-home --home-dir /opt/odoo --no-log-init odoo
 RUN echo "odoo:odoo" | chpasswd
 
 # Copy Odoo configuration & entrypoint files
-COPY ./odoo.conf /opt/odoo
-COPY ./entrypoint.sh /opt/odoo
+COPY --chown="odoo:odoo" ./odoo.conf /opt/odoo
+COPY --chown="odoo:odoo" ./entrypoint.sh /opt/odoo
 
 # Install latest postgresql-client
 RUN apt-get update  \
