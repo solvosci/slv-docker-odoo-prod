@@ -61,6 +61,7 @@ RUN set -x; \
         && wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.0g-2ubuntu4_amd64.deb \
         && dpkg -i libssl1.1_1.1.0g-2ubuntu4_amd64.deb \
         && curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6-1/wkhtmltox_0.12.6-1.focal_amd64.deb \
+        && echo '4a974456d6271908c46aa38fc177f99d6cd3b39a  wkhtmltox.deb' | sha1sum -c - \
         && apt install -y --no-install-recommends ./wkhtmltox.deb \
         && rm -rf /var/lib/apt/lists/* wkhtmltox.deb \
         && apt install libssl-dev build-essential zlib1g-dev \
