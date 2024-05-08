@@ -107,7 +107,7 @@ RUN /bin/bash -c "mkdir -p /opt/odoo/custom-addons"
 RUN /bin/bash -c "cd /opt/odoo && virtualenv -p python3.8 venv"
 
 # Python dependencies, specific library versions to fix dependences error
-RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -U setuptools && pip3 install -r /opt/odoo/odoo/requirements.txt && pip3 install -U cryptography==38.0.2 && pip3 install -U pyopenssl==23.2.0 && deactivate"
+RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -U setuptools && pip3 install -r /opt/odoo/odoo/requirements.txt && deactivate"
 
 # Clone interesting OCA repositories
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/account-analytic -b 15.0 --single-branch --depth 1 account-analytic"
@@ -143,7 +143,6 @@ RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/timesheet -b 15.0 --single-branch --depth 1 timesheet"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/web -b 15.0 --single-branch --depth 1 web"
 
-
 #OCA Dependencies
 RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/account-financial-tools/requirements.txt && deactivate"
 # RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/bank-payment/requirements.txt && deactivate"
@@ -158,6 +157,8 @@ RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /op
 RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/stock-logistics-barcode/requirements.txt && deactivate"
 # RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/web/requirements.txt && deactivate"
 # RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/server-tools/requirements.txt && deactivate"
+
+RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip3 install -U cryptography==38.0.2 && pip3 install -U pyopenssl==23.2.0 && pip3 install -U requests-pkcs12==1.16 && deactivate"
 
 VOLUME ["/opt/odoo"]
 
