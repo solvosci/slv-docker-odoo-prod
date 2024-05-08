@@ -63,11 +63,12 @@ RUN set -x; \
             libxrender1 \
             xfonts-75dpi \
             xfonts-base \
-        && curl -o wkhtmltox.deb -SL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.bionic_amd64.deb \
-        && echo 'f1689a1b302ff102160f2693129f789410a1708a wkhtmltox.deb' | sha1sum -c - \
-        && dpkg --force-depends -i wkhtmltox.deb\
-        && apt-get -y install -f --no-install-recommends \
-        && rm -rf /var/lib/apt/lists/* wkhtmltox. \
+        && wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.0g-2ubuntu4_amd64.deb \
+        && dpkg -i libssl1.1_1.1.0g-2ubuntu4_amd64.deb \
+        && curl -o wkhtmltox.deb -sSL https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.5/wkhtmltox_0.12.5-1.focal_amd64.deb \
+        && echo 'ae4e85641f004a2097621787bf4381e962fb91e1 wkhtmltox.deb' | sha1sum -c - \
+        && apt install -y --no-install-recommends ./wkhtmltox.deb \
+        && rm -rf /var/lib/apt/lists/* wkhtmltox.deb \
         && apt install libssl-dev build-essential zlib1g-dev \
         && curl -o Python-3.8.10.tgz -SL https://www.python.org/ftp/python/3.8.10/Python-3.8.10.tgz \
         && tar xzf Python-3.8.10.tgz \
@@ -80,8 +81,8 @@ RUN useradd --create-home --home-dir /opt/odoo --no-log-init odoo
 RUN echo "odoo:odoo" | chpasswd
 
 # Copy Odoo configuration & entrypoint files
-COPY ./odoo.conf /opt/odoo
-COPY ./entrypoint.sh /opt/odoo
+COPY --chown="odoo:odoo" ./odoo.conf /opt/odoo
+COPY --chown="odoo:odoo" ./entrypoint.sh /opt/odoo
 
 # Install latest postgresql-client
 RUN apt-get update  \
@@ -102,11 +103,18 @@ USER odoo
 RUN /bin/bash -c "cd /opt/odoo && git clone https://github.com/odoo/odoo --branch 15.0 --single-branch --depth 1"
 RUN /bin/bash -c "mkdir -p /opt/odoo/custom-addons"
 
+# Create Virtual Enviroment
+RUN /bin/bash -c "cd /opt/odoo && virtualenv -p python3.8 venv"
+
+# Python dependencies, specific library versions to fix dependences error
+RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -U setuptools && pip3 install -r /opt/odoo/odoo/requirements.txt && deactivate"
+
 # Clone interesting OCA repositories
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/account-analytic -b 15.0 --single-branch --depth 1 account-analytic"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/account-financial-reporting -b 15.0 --single-branch --depth 1 account-financial-reporting"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/account-financial-tools -b 15.0 --single-branch --depth 1 account-financial-tools"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/account-invoicing -b 15.0 --single-branch --depth 1 account-invoicing"
+RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/account-payment -b 15.0 --single-branch --depth 1 account-payment"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/bank-payment -b 15.0 --single-branch --depth 1 bank-payment"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/community-data-files -b 15.0 --single-branch --depth 1 community-data-files"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/connector -b 15.0 --single-branch --depth 1 connector"
@@ -135,12 +143,10 @@ RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/timesheet -b 15.0 --single-branch --depth 1 timesheet"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/web -b 15.0 --single-branch --depth 1 web"
 
-# Create Virtual Enviroment
-RUN /bin/bash -c "cd /opt/odoo && virtualenv -p python3.8 venv"
-
 #OCA Dependencies
 RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/account-financial-tools/requirements.txt && deactivate"
 # RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/bank-payment/requirements.txt && deactivate"
+RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/account-payment/requirements.txt && deactivate"
 RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/community-data-files/requirements.txt && deactivate"
 RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/connector/requirements.txt && deactivate"
 # RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/edi/requirements.txt && deactivate"
@@ -152,8 +158,7 @@ RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /op
 # RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/web/requirements.txt && deactivate"
 # RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/custom-addons/server-tools/requirements.txt && deactivate"
 
-# Python dependencies
-RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -U setuptools && pip3 install -r /opt/odoo/odoo/requirements.txt && deactivate"
+RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip3 install -U cryptography==38.0.2 && pip3 install -U pyopenssl==23.2.0 && pip3 install -U requests-pkcs12==1.16 && deactivate"
 
 VOLUME ["/opt/odoo"]
 
