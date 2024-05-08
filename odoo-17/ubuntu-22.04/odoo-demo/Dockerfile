@@ -36,7 +36,6 @@ RUN set -x; \
             wget \
             xz-utils \
             libxmlsec1-dev \
-            ccze \
             curl \
             ntp \
             socat \

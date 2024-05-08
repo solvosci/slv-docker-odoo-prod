@@ -36,4 +36,6 @@ services:
 
 volumes:
   postgres-data-demo:
+    name: postgres-data-demo
   odoo-data-demo:
+    name: odoo-data-demo

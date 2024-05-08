@@ -144,7 +144,7 @@ RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA
 # Python dependencies
 RUN /bin/bash -c "cd /opt/odoo && virtualenv -p python3.10 venv && source venv/bin/activate && pip install -U setuptools && python3.10 -m pip install -r /opt/odoo/odoo/requirements.txt && deactivate"
 
-VOLUME ["/opt/odoo"]º
+VOLUME ["/opt/odoo"]
 
 # Expose Odoo services
 EXPOSE 8069 8072
