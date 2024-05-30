@@ -4,38 +4,71 @@ networks:
     driver: bridge
     name: customNetwork
 services:
-  db-demo:
-    container_name: postgresql-demo
+  db-prod:
+    container_name: postgresql-prod
     image: postgres:14.0
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
-      - ${POSTGRES_PORT_DEMO}:5432
+      - ${POSTGRES_PORT_PROD}:5432
     volumes:
-      - postgres-data-demo:/var/lib/postgresql/data
+      - postgres-data-prod:/var/lib/postgresql/data
     restart: always
     networks:
       - customNetwork
-  odoo-demo:
+  odoo-prod:
     restart: always
-    container_name: odoo-${ODOO_VERSION_DEMO}
-    build: odoo-demo
+    container_name: odoo-${ODOO_VERSION_PROD}
+    build: odoo-prod
     ports:
-      - ${HTTP_PORT_DEMO}:8069
-      - ${LONGPOLLING_PORT_DEMO}:8072
+      - ${HTTP_PORT_PROD}:8069
+      - ${LONGPOLLING_PORT_PROD}:8072
     volumes:
-      - odoo-data-demo:/opt/odoo
+      - odoo-data-prod:/opt/odoo
     depends_on:
-      - db-demo
+      - db-prod
     environment:
-      DB_PORT_5432_TCP_ADDR: db-demo
-      POSTGRES_HOST: postgresql-demo
+      DB_PORT_5432_TCP_ADDR: db-prod
+      POSTGRES_HOST: postgresql-prod
+    networks:
+      - customNetwork
+  db-test:
+    container_name: postgresql-test
+    image: postgres:14.0
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - ${POSTGRES_PORT_TEST}:5432
+    volumes:
+      - postgres-data-test:/var/lib/postgresql/data
+    restart: always
+    networks:
+      - customNetwork
+  odoo-test:
+    restart: always
+    container_name: odoo-${ODOO_VERSION_TEST}
+    build: odoo-test
+    ports:
+      - ${HTTP_PORT_TEST}:8069
+      - ${LONGPOLLING_PORT_TEST}:8072
+    volumes:
+      - odoo-data-test:/opt/odoo
+    depends_on:
+      - db-test
+    environment:
+      DB_PORT_5432_TCP_ADDR: db-test
+      POSTGRES_HOST: postgresql-test
     networks:
       - customNetwork
 
 volumes:
-  postgres-data-demo:
-    name: postgres-data-demo
-  odoo-data-demo:
-    name: odoo-data-demo
+  postgres-data-prod:
+    name: postgres-data-prod
+  odoo-data-prod:
+    name: odoo-data-prod
+  postgres-data-test:
+    name: postgres-data-test
+  odoo-data-test:
+    name: odoo-data-test

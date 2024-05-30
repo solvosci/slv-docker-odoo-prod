@@ -138,6 +138,7 @@ RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/stock-logistics-workflow -b 17.0 --single-branch --depth 1 stock-logistics-workflow"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/timesheet -b 17.0 --single-branch --depth 1 timesheet"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/web -b 17.0 --single-branch --depth 1 web"
+RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/website -b 17.0 --single-branch --depth 1 website"
 
 #OCA Dependencies
 
