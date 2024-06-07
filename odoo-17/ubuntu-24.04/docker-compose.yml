@@ -65,10 +65,10 @@ services:
 
 volumes:
   postgres-data-prod:
-    name: postgres-data-prod
+    name: postgres-data-17-prod
   odoo-data-prod:
-    name: odoo-data-prod
+    name: odoo-data-17-prod
   postgres-data-test:
-    name: postgres-data-test
+    name: postgres-data-17-test
   odoo-data-test:
-    name: odoo-data-test
+    name: odoo-data-17-test

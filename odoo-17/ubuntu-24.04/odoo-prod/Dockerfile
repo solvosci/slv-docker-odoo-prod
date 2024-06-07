@@ -101,12 +101,15 @@ USER odoo
 RUN /bin/bash -c "cd /opt/odoo && git clone https://github.com/odoo/odoo --branch 17.0 --single-branch --depth 1"
 RUN /bin/bash -c "mkdir -p /opt/odoo/custom-addons"
 
+
 # Clone interesting OCA repositories
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/account-analytic -b 17.0 --single-branch --depth 1 account-analytic"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/account-financial-reporting -b 17.0 --single-branch --depth 1 account-financial-reporting"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/account-financial-tools -b 17.0 --single-branch --depth 1 account-financial-tools"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/account-invoicing -b 17.0 --single-branch --depth 1 account-invoicing"
+RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/account-reconcile -b 17.0 --single-branch --depth 1 account-reconcile"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/bank-payment -b 17.0 --single-branch --depth 1 bank-payment"
+RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/bank-statement-import -b 17.0 --single-branch --depth 1 bank-statement-import"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/community-data-files -b 17.0 --single-branch --depth 1 community-data-files"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/connector -b 17.0 --single-branch --depth 1 connector"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/crm -b 17.0 --single-branch --depth 1 crm"
@@ -140,10 +143,27 @@ RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/web -b 17.0 --single-branch --depth 1 web"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/website -b 17.0 --single-branch --depth 1 website"
 
+#Create virtual environment
+RUN /bin/bash -c "cd /opt/odoo && virtualenv -p python3.10 venv && source venv/bin/activate && pip install -U setuptools"
+
 #OCA Dependencies
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install -r bank-payment/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install -r bank-statement-import/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install -r community-data-files/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install -r connector/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install -r edi/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install -r l10n-spain/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install -r partner-contact/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install -r queue/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install -r reporting-engine/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install -r server-tools/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install -r stock-logistics-barcode/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install -r web/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install -r bank-statement-import/requirements.txt && deactivate"
+
 
 # Python dependencies
-RUN /bin/bash -c "cd /opt/odoo && virtualenv -p python3.10 venv && source venv/bin/activate && pip install -U setuptools && python3.10 -m pip install -r /opt/odoo/odoo/requirements.txt && deactivate"
+RUN /bin/bash -c "cd /opt/odoo && source venv/bin/activate && pip install -r /opt/odoo/odoo/requirements.txt && deactivate"
 
 VOLUME ["/opt/odoo"]
 
