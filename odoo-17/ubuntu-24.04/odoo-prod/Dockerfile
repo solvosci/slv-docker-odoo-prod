@@ -106,7 +106,9 @@ RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/account-financial-reporting -b 17.0 --single-branch --depth 1 account-financial-reporting"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/account-financial-tools -b 17.0 --single-branch --depth 1 account-financial-tools"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/account-invoicing -b 17.0 --single-branch --depth 1 account-invoicing"
+RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/account-reconcile -b 17.0 --single-branch --depth 1 account-reconcile"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/bank-payment -b 17.0 --single-branch --depth 1 bank-payment"
+RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/bank-statement-import -b 17.0 --single-branch --depth 1 bank-statement-import"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/community-data-files -b 17.0 --single-branch --depth 1 community-data-files"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/connector -b 17.0 --single-branch --depth 1 connector"
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/crm -b 17.0 --single-branch --depth 1 crm"
@@ -141,6 +143,21 @@ RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA
 RUN /bin/bash -c "cd /opt/odoo/custom-addons && git clone https://github.com/OCA/website -b 17.0 --single-branch --depth 1 website"
 
 #OCA Dependencies
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install bank-payment/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install bank-statement-import/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install community-data-files/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install connector/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install edi/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install l10n-spain/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install partner-contact/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install queue/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install reporting-engine/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install server-tools/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install stock-logistics-barcode/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install web/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install account-reconcile/requirements.txt && deactivate"
+RUN /bin/bash -c "source /opt/odoo/venv/bin/activate && cd /opt/odoo/custom-addons && pip install bank-statement-import/requirements.txt && deactivate"
+
 
 # Python dependencies
 RUN /bin/bash -c "cd /opt/odoo && virtualenv -p python3.10 venv && source venv/bin/activate && pip install -U setuptools && python3.10 -m pip install -r /opt/odoo/odoo/requirements.txt && deactivate"
